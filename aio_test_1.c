@@ -38,10 +38,6 @@ int main()
 	aio_init(&aioInit);
 
 
-
-
-
-
 	out_fd = open(outFilename, O_CREAT|O_TRUNC|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);	
 
   	if(out_fd < 0) 
@@ -65,11 +61,12 @@ int main()
       	exit(EXIT_FAILURE);
     	}   
 
-
+		/* Zero writeBuffers */
  		memset(writeBuffers[i], 0, 2*WIDTH*HEIGHT);
-
-
+	
+		/* Zero aiocb */
    	memset(&aiocbp[i], 0, sizeof(struct aiocb));
+
    	aiocbp[i].aio_fildes = out_fd;
    	aiocbp[i].aio_nbytes = 2*WIDTH*HEIGHT;
    	aiocbp[i].aio_buf = writeBuffers[i];
@@ -95,10 +92,6 @@ int main()
 		
 		printf("%d: %x...\n", i, dataBuffers[i][0]);
 	}
-	
-
-
-	printf("Hello world...\n");
 	
 	
 	return 0;
