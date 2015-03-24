@@ -66,7 +66,7 @@ int main()
 	registerHandlers();
 
 	memset(&aioInit, 0, sizeof(aioInit));
-	aioInit.aio_threads = 1;
+	aioInit.aio_threads = 5;
 	aioInit.aio_num = MAX_REQUEST;
 	aio_init(&aioInit);
 
@@ -76,8 +76,6 @@ int main()
 
 	strcat(outFilename, tmp);
 	strcat(outFilename, FILE_EXT);
-
-	printf("\n%s\n", outFilename);
 
 	out_fd = open(outFilename, O_CREAT|O_TRUNC|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);	
 
@@ -103,10 +101,10 @@ int main()
     	}   
 
 		/* Zero writeBuffers */
- 		memset(writeBuffers[i], 0, 2*WIDTH*HEIGHT);
+ 		memset(writeBuffers[i], i, 2*WIDTH*HEIGHT);
 	
 		/* Zero aiocb */
-   	memset(&aiocbp[i], i, sizeof(struct aiocb));
+   	memset(&aiocbp[i], 0, sizeof(struct aiocb));
 
    	aiocbp[i].aio_fildes = out_fd;
    	aiocbp[i].aio_nbytes = 2*WIDTH*HEIGHT;
@@ -125,10 +123,12 @@ int main()
   		else
   		{
 
+			printf("%d: %x...\n", k, writeBuffers[k][0]);
     		err = aio_write(&aiocbp[k]);
     		if(err) 
     		{
       		printf("Error: aio_error() %lu : %d\n", k, err);
+				printf("aio_filedes=%d\n", aiocbp[k].aio_fildes);
       		return -1;      
     		}      
   		}
@@ -136,9 +136,7 @@ int main()
   		k = (k+1) % MAX_REQUEST;
 
 		usleep(4000);
-		break;
 	}
-	
 	
 	return 0;
 }

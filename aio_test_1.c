@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <aio.h>
+#include <sys/statvfs.h>
 
 #define MAX_REQUEST	(32)
 
@@ -29,6 +30,8 @@ int main()
 {
 	struct aioinit aioInit;
 	struct aiocb aiocbp[MAX_REQUEST];
+
+  	struct statvfs sbuf;
 
 	int i = -1;
 
@@ -92,7 +95,21 @@ int main()
 		
 		printf("%d: %x...\n", i, dataBuffers[i][0]);
 	}
-	
-	
+
+   if (statvfs("/home/mp/aio_proj/aio_test_1.c", &sbuf) < 0)
+   {
+   	return -1;
+   }
+     
+   printf("sbuf.f_bsize=%lu\n", sbuf.f_bsize);
+   printf("sbuf_frsize=%lu\n", sbuf.f_frsize);
+   printf("sbuf.f_blocks=%lu\n", sbuf.f_blocks);
+   printf("sbuf.f_bfree=%lu\n", sbuf.f_bfree);
+   printf("sbuf.f_bavail=%lu\n", sbuf.f_bavail);
+
+
+   printf("Bytes left: %lu \n", sbuf.f_bsize * sbuf.f_bavail/1024);
+	printf("Percent left: %f: \n", (double) (sbuf.f_blocks - sbuf.f_bfree) / (double) (sbuf.f_blocks - sbuf.f_bfree + sbuf.f_bavail) *100.0);
+
 	return 0;
 }
